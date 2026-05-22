@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Arsenal 25/26 Champions</title>
+
+  <style>
+    /* 전체 기본 설정 */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Helvetica Neue", Arial, "Noto Sans KR", sans-serif;
+      /* 아스날의 세련된 다크 네이비/블랙 느낌 */
+      background: #0a0e17;
+      color: #f5f7fb;
+      line-height: 1.6;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* 상단 메뉴 */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(10, 14, 23, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    nav {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-weight: 900;
+      letter-spacing: 1px;
+      font-size: 22px;
+      /* 아스날 골드 컬러 */
+      color: #d4af37;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      font-size: 15px;
+      font-weight: bold;
+      color: #cbd5e1;
+    }
+
+    .nav-links a:hover {
+      color: #ef0107; /* 아스날 레드 */
+    }
+
+    /* 첫 화면 */
+    .hero {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 90px 20px 80px;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      border-radius: 999px;
+      color: #d4af37;
+      background: rgba(212, 175, 55, 0.1);
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      font-size: 52px;
+      line-height: 1.2;
+      margin-bottom: 22px;
+    }
+
+    h1 span {
+      color: #ef0107;
+    }
+
+    .hero p {
+      font-size: 19px;
+      color: #cbd5e1;
+      margin-bottom: 30px;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .btn {
+      padding: 13px 24px;
+      border-radius: 12px;
+      font-weight: 700;
+      transition: 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ef0107, #9b0000);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(239, 1, 7, 0.3);
+    }
+
+    .btn-secondary {
+      border: 1px solid rgba(212, 175, 55, 0.5);
+      color: #d4af37;
+      background: rgba(212, 175, 55, 0.05);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    /* 전술판(네트워크) 그림 영역 */
+    .pitch-card {
+      position: relative;
+      min-height: 330px;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(239, 1, 7, 0.2), transparent 40%),
+        radial-gradient(circle at 80% 60%, rgba(212, 175, 55, 0.15), transparent 30%),
+        rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      box-shadow: 0 20px 70px rgba(0, 0, 0, 0.4);
+    }
+
+    .player-node {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ef0107;
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 15px rgba(239, 1, 7, 0.8);
+    }
+
+    /* 수비진에서 미드필더를 거쳐 세트피스로 이어지는 패스길 느낌 */
+    .player-node:nth-child(1) { left: 20%; top: 40%; }
+    .player-node:nth-child(2) { left: 50%; top: 20%; }
+    .player-node:nth-child(3) { left: 55%; top: 65%; }
+    .player-node:nth-child(4) { left: 80%; top: 45%; }
+
+    .pass-line {
+      position: absolute;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #d4af37, transparent);
+      opacity: 0.85;
+      animation: passFlow 2s infinite linear;
+    }
+
+    .pass-line1 {
+      width: 140px;
+      left: 23%;
+      top: 30%;
+      transform: rotate(-30deg);
+    }
+
+    .pass-line2 {
+      width: 150px;
+      left: 23%;
+      top: 53%;
+      transform: rotate(35deg);
+    }
+
+    .pass-line3 {
+      width: 120px;
+      left: 58%;
+      top: 33%;
+      transform: rotate(45deg);
+    }
+
+    @keyframes passFlow {
+      0% { opacity: 0.1; }
+      50% { opacity: 1; box-shadow: 0 0 10px #d4af37; }
+      100% { opacity: 0.1; }
+    }
+
+    .scoreboard {
+      position: absolute;
+      left: 30px;
+      bottom: 25px;
+      right: 30px;
+      padding: 15px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      font-family: Consolas, monospace;
+      color: #ffffff;
+      font-size: 15px;
+      text-align: center;
+    }
+
+    .scoreboard span {
+      color: #d4af37;
+      font-weight: bold;
+    }
+
+    /* 공통 섹션 */
+    section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 70px 20px;
+    }
+
+    .section-title {
+      font-size: 34px;
+      margin-bottom: 16px;
+      border-left: 5px solid #ef0107;
+      padding-left: 15px;
+    }
+
+    .section-desc {
+      color: #cbd5e1;
+      margin-bottom: 34px;
+      max-width: 800px;
+      font-size: 17px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .card {
+      padding: 26px;
+      border-radius: 22px;
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      border-color: rgba(239, 1, 7, 0.4);
+      background: rgba(239, 1, 7, 0.05);
+    }
+
+    .card h3 {
+      color: #d4af37;
+      margin-bottom: 12px;
+      font-size: 22px;
+    }
+
+    .card p {
+      color: #cbd5e1;
+      font-size: 15px;
+    }
+
+    /* 타임라인(주차별 계획 변형) */
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .event {
+      padding: 20px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.78);
+      border-left: 4px solid #ef0107;
+      color: #cbd5e1;
+    }
+
+    .event strong {
+      color: #d4af37;
+      font-size: 18px;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    /* 하단 */
+    footer {
+      padding: 40px 20px;
+      text-align: center;
+      color: #94a3b8;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      background: #05080f;
+      font-size: 14px;
+    }
+
+    footer span {
+      color: #ef0107;
+      font-weight: bold;
+    }
+
+    /* 모바일 화면 */
+    @media (max-width: 800px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 60px;
+      }
+      h1 { font-size: 40px; }
+      .grid, .timeline { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav>
+      <div class="logo">Arsenal FC</div>
+      <div class="nav-links">
+        <a href="#history">구단 역사</a>
+        <a href="#pl-history">PL 역사</a>
+        <a href="#achievements">주요 업적</a>
+        <a href="#squad">25/26 스쿼드</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <div class="badge">2025/26 Premier League Champions</div>
+        <h1>런던의 주인, <br><span>아스날</span> 우승을 거머쥐다</h1>
+        <p>
+          주축 선수들의 부상 악재마저 뚫어낸 25/26 시즌 챔피언 아스날! 찬란했던 03/04 무패 우승의 역사부터, 
+          미켈 아르테타 감독과 함께 다시 한번 잉글랜드 정점에 선 현재의 영광까지 모두 기록합니다.
+        </p>
+
+        <div class="buttons">
+          <a class="btn btn-primary" href="#achievements">우승 기록 보기</a>
+          <a class="btn btn-secondary" href="#squad">챔피언스 스쿼드</a>
+        </div>
+      </div>
+
+      <div class="pitch-card">
+        <div class="player-node"></div>
+        <div class="player-node"></div>
+        <div class="player-node"></div>
+        <div class="player-node"></div>
+
+        <div class="pass-line pass-line1"></div>
+        <div class="pass-line pass-line2"></div>
+        <div class="pass-line pass-line3"></div>
+
+        <div class="scoreboard">
+          Match 38. Arsenal vs Aston Villa<br />
+          <span>GOAL!</span> Gabriel Magalhães (89') | Assist: D. Rice
+        </div>
+      </div>
+    </section>
+
+    <section id="history">
+      <h2 class="section-title">아스날 구단 역사</h2>
+      <p class="section-desc">
+        1886년 울위치의 무기 공장 노동자들이 창단한 다이얼 스퀘어(Dial Square)에서 시작하여, 북런던을 대표하는 세계적인 명문 구단으로 성장하기까지의 여정입니다.
+      </p>
+
+      <div class="timeline">
+        <div class="event"><strong>1886년 창단</strong> 런던 남부 울위치에서 로얄 아스날(Royal Arsenal)이라는 이름으로 축구의 역사를 시작했습니다.</div>
+        <div class="event"><strong>1913년 하이버리 이전</strong> 북런던의 하이버리 스타디움으로 홈구장을 이전하며, 토트넘과의 치열한 북런던 더비가 시작되었습니다.</div>
+        <div class="event"><strong>허버트 채프먼 시대 (1930년대)</strong> WM 포메이션의 도입과 등번호 사용 등 현대 축구의 기틀을 다지며 첫 전성기를 맞이했습니다.</div>
+        <div class="event"><strong>아르센 벵거 시대 (1996~2018)</strong> 아름다운 패스 축구(벵거볼)의 도입과 영양/훈련 방식의 혁명으로 프리미어리그의 판도를 바꿨습니다.</div>
+        <div class="event"><strong>2006년 에미레이츠 스타디움</strong> 더 큰 도약을 위해 정든 하이버리를 떠나 6만 석 규모의 최첨단 구장으로 이전했습니다.</div>
+        <div class="event"><strong>아르테타의 재건 (2019~현재)</strong> 암흑기를 극복하고 강력한 수비와 전술로 팀을 완벽히 재건하여 25/26 시즌 우승을 이뤄냈습니다.</div>
+      </div>
+    </section>
+
+    <section id="pl-history">
+      <h2 class="section-title">프리미어리그 역사 속의 아스날</h2>
+      <p class="section-desc">
+        1992년 잉글랜드 1부 리그가 '프리미어리그(EPL)'로 개편된 이후, 아스날이 남긴 굵직한 발자취입니다.
+      </p>
+
+      <div class="grid">
+        <div class="card">
+          <h3>97/98 더블 달성</h3>
+          <p>아르센 벵거 감독 부임 후 첫 프리미어리그 우승이자 FA컵 우승을 동시에 달성하며 맨유의 독주를 막아냈습니다.</p>
+        </div>
+
+        <div class="card">
+          <h3>01/02 원정 무패 우승</h3>
+          <p>올드 트래포드 원정에서 리그 우승을 확정 지으며, 압도적인 공수 밸런스로 통산 두 번째 더블을 기록했습니다.</p>
+        </div>
+
+        <div class="card">
+          <h3>03/04 The Invincibles</h3>
+          <p>26승 12무 0패. 프리미어리그 출범 이후 전무후무한 '무패 우승'이라는 금자탑을 쌓아 올렸습니다. 황금 사자 트로피의 주역입니다.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="achievements">
+      <h2 class="section-title">주요 업적 및 타이틀</h2>
+      <p class="section-desc">
+        잉글랜드 축구 역사상 가장 성공적인 클럽 중 하나인 아스날의 주요 트로피 수집 기록입니다.
+      </p>
+
+      <div class="grid">
+        <div class="card">
+          <h3>🏆 리그 통산 14회 우승</h3>
+          <p>1930년대의 영광부터 2004년의 무패 우승, 그리고 대망의 25/26 시즌 프리미어리그 제패까지 총 14번의 1부 리그 우승을 기록했습니다.</p>
+        </div>
+
+        <div class="card">
+          <h3>🏆 FA컵 역대 최다 우승</h3>
+          <p>총 14회의 FA컵 우승 트로피를 들어 올리며, 잉글랜드 최고의 컵 대회에서 가장 강력한 모습을 보여주는 'FA컵의 제왕'입니다.</p>
+        </div>
+
+        <div class="card">
+          <h3>⭐ 49경기 연속 무패</h3>
+          <p>2003년 5월부터 2004년 10월까지 기록한 49경기 연속 무패 기록은 아직까지도 잉글랜드 축구 역사상 최장 기록으로 남아있습니다.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="squad">
+      <h2 class="section-title">25/26 시즌 우승의 주역들</h2>
+      <p class="section-desc">
+        핵심 자원들의 부상 이탈이라는 거대한 위기 속에서도, 역대급 폼으로 팀을 리그 정상으로 하드캐리한 진정한 에이스 3인방입니다.
+      </p>
+
+      <div class="grid">
+        <div class="card">
+          <h3>데클란 라이스 (Declan Rice)</h3>
+          <p>외데고르가 빠진 중원의 완벽한 지배자. 엄청난 활동량으로 수비를 보호하는 동시에 전진 패스와 찬스 메이킹까지 전담하며, 세트피스 상황에선 날카로운 킥으로 수많은 어시스트를 적립한 대체 불가 에이스입니다.</p>
+        </div>
+
+        <div class="card">
+          <h3>다비드 라야 (David Raya)</h3>
+          <p>아스날의 골문을 든든하게 걸어 잠근 최후의 보루. 올 시즌 프리미어리그 최고 수준의 선방률(83% 이상)을 기록하며, 한 골 차의 살얼음판 승부마다 경이로운 세이브로 승점을 지켜냈습니다.</p>
+        </div>
+
+        <div class="card">
+          <h3>가브리엘 마갈량이스 (Gabriel Magalhães)</h3>
+          <p>살리바와 함께 리그 최고 철벽의 중심이자 '수트라이커'. 압도적인 대인 마크와 공중볼 장악력으로 수비진을 리드했으며, 중요한 순간마다 라이스의 코너킥을 헤더로 꽂아 넣으며 우승의 결정적인 공을 세웠습니다.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 <span>Arsenal Football Club</span> Tribute Page | Built with GitHub Pages for Computer Networks Assignment
+  </footer>
+
+  <script>
+    // 네비게이션 버튼 클릭 시 부드럽게 스크롤 이동
+    document.querySelectorAll('a[href^="#"]').forEach(function(link) {
+      link.addEventListener("click", function(event) {
+        event.preventDefault();
+        const target = document.querySelector(this.getAttribute("href"));
+        if (target) {
+          target.scrollIntoView({
+            behavior: "smooth"
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
